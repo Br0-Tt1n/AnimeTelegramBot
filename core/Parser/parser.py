@@ -21,7 +21,7 @@ class DarkLibriaSpider(scrapy.Spider):
         )
         self.cursor = self.con.cursor()
 
-    def parse(self, response):
+    def parse(self, response, **kwargs):
         for h5 in response.css('td[class="torrent text-center h5"]'):
             anime_name = h5.css('a::attr(onclick)').get()
             description_name = re.search(r'"[^"]*"(,\s*"([^"]*)")', anime_name).group(2)

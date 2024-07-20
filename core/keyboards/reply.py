@@ -27,6 +27,19 @@ def get_anime_keyboard():
                                       input_field_placeholder='Выбери вариант поиска')
 
 
+def get_random_anime_keyboard():
+    keyboard_builder = ReplyKeyboardBuilder()
+
+    keyboard_builder.button(text="Рандом")
+    keyboard_builder.button(text="Добавить в избранное")
+    keyboard_builder.button(text="Назад")
+    keyboard_builder.adjust(2)
+
+    return keyboard_builder.as_markup(resize_keyboard=True,
+                                      one_time_keyboard=False,
+                                      input_field_placeholder='Ну что?')
+
+
 def get_favorites_keyboard():
     keyboard_builder = ReplyKeyboardBuilder()
 

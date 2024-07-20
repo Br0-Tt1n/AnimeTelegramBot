@@ -3,9 +3,10 @@ import asyncio
 from aiogram import Bot
 from aiogram.types import Message
 
-from core.keyboards.reply import (get_favorites_keyboard, get_anime_keyboard, get_first_keyboard)
+from core.keyboards.reply import (get_favorites_keyboard, get_anime_keyboard, get_first_keyboard,
+                                  get_random_anime_keyboard)
 
-from database.bd import ConnectDB
+from database.db import ConnectDB
 
 
 db = ConnectDB()
@@ -26,7 +27,8 @@ async def get_start(message: Message, bot: Bot):
                   '     5) Добавление <b>САЙТОВ</b> в избранные чтобы отслеживать выход аниме именно на выбранных, '
                   ' а так же добавление любимой озвучки в избранное\n'
                   'P.S.: добавление самого аниме-файл не предусматривается, но возможно будет рассмотрен в будущем')
-
+    id_us = message.from_user.id
+    db.check_insert_users(id_us)
     await message.answer(start_text, reply_markup=get_first_keyboard())
 
 
@@ -39,17 +41,38 @@ async def keyboard_handlers(message: Message):
         await message.answer(text='Создание кнопок', reply_markup=get_favorites_keyboard())
     elif text == "Назад":
         await message.answer(text='Создание кнопок', reply_markup=get_first_keyboard())
+    elif text == "Случайное аниме":
+        await message.answer(text='Создание кнопок', reply_markup=get_random_anime_keyboard())
 
 
 async def random_anime(message: Message):
     global db
     random_anime_result = db.get_randon_anime()
-    await message.answer(text=f'<a href="{random_anime_result[1]}">{random_anime_result[0]}</a>', parse_mode='HTML')
+    await message.answer(text=f'<a href="{random_anime_result[1]}">'
+                              f'{random_anime_result[0]}</a>', parse_mode='HTML', disable_web_page_preview=True)
 
 
-async def get_let_anime(message: Message, bot: Bot):
-    anime_name = ('Пример названия аниме ')
-    await message.answer(anime_name)
+async def insert_favorite(message: Message):
+    id_us = message.from_user.id
+    global db
+    int_id = db.get_id_from_favorite(id_us)
+    if db.check_favorite_for_user(int_id):
+        db.insert_favorites_anime(int_id)
+        await message.answer(text="Добавлено в избранное!")
+    else:
+        await message.answer(text="У вас уже есть это аниме в избранном!")
+
+
+async def get_favorite(message: Message):
+    id_us = message.from_user.id
+    count = 1
+    global db
+    list_anime = db.get_favorite_anime(id_us)
+    result_text = "Вот ваш список избранного:\n"
+    for i in list_anime:
+        result_text += f'<a href="{i[3]}">{count}: {i[2]}</a>\n'
+        count += 1
+    await message.answer(text=result_text, parse_mode='HTML', disable_web_page_preview=True)
 
 
 async def get_user_id(message: Message):

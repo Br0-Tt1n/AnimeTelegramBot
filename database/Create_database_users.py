@@ -13,20 +13,17 @@ if connection.is_connected():
     cursor = connection.cursor()
 
     database_name = 'test_database_for_1vBOT'
-    cursor.execute(f"CREATE DATABASE {database_name};")
-    print(f"База данных успешно завершена!")
 
     connection.database = database_name
     print(f"Подключено к базе данных '{database_name}' успешно")
 
     cursor.execute("""
-        CREATE TABLE anime (
+        CREATE TABLE users (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            anime_name VARCHAR(500),
-            anime_link VARCHAR(5000)
+            user_id INT UNIQUE NOT NULL
         );
     """)
-    print("Таблица anime успешно создана")
+    print("Таблица favorite_anime успешно создана")
 
     cursor.close()
     connection.close()

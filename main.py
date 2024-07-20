@@ -7,9 +7,10 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from core.settings import settings
-from core.handlers.basic import (get_start, get_let_anime, keyboard_handlers, random_anime, get_user_id)
+from core.handlers.basic import (get_start, keyboard_handlers, random_anime, get_user_id, insert_favorite,
+                                 get_favorite)
 
-from database.bd import ConnectDB
+from database.db import ConnectDB
 
 
 async def main():
@@ -25,16 +26,29 @@ async def main():
 
     # здесь будут все функции бота
     dp.message.register(get_start, Command(commands=['start', 'начать', 'run', 'поехали']))
-    dp.message.register(get_let_anime, Command(commands=["список", "аниме", "список аниме"]))
 
     dp.message.register(keyboard_handlers, lambda message: any(cmd in message.text for cmd
-                                                               in ["Аниме", "Избранное", "Назад"]))
+                                                               in ["Аниме", "Избранное", "Назад", "Случайное аниме"]))
 
-    dp.message.register(random_anime, F.text == 'Случайное аниме')
+    dp.message.register(random_anime, F.text == 'Рандом')
+    dp.message.register(insert_favorite, F.text == 'Добавить в избранное')
+    dp.message.register(get_favorite, F.text == "Список избранных аниме")
+
     dp.message.register(get_user_id, F.text)
 
     # Проверка всех имеющихся записей
-    # db.get_all()
+    # db.get_all_favorite()
+
+    #  Изменение размера ячейки у определенной колонки
+    # db.change_column()
+
+    #  Просмотр индекса таблицы
+    # db.show_index_db()
+
+    # Отчистка всех данных бд
+    # db.clear_db()
+
+    # db.show_desc_table()
 
     try:
         await dp.start_polling(bot)
