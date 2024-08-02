@@ -5,6 +5,8 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
+from core.settings import settings_bd
+
 
 class DarkLibriaSpider(scrapy.Spider):
     name = 'DarkLibria'
@@ -14,10 +16,10 @@ class DarkLibriaSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super(DarkLibriaSpider, self).__init__(*args, **kwargs)
         self.con = con.connect(
-            host='localhost',
-            user='_Br0_',
-            password='kolokolikolokolpop009',
-            database='test_database_for_1vBOT'
+            host=settings_bd.datadb.host,
+            user=settings_bd.datadb.user,
+            port=int(settings_bd.datadb.port),
+            password=settings_bd.datadb.password
         )
         self.cursor = self.con.cursor()
 
