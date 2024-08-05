@@ -32,7 +32,9 @@ settings = get_settings('.env')
 class DatabaseSetting:
     host: str
     user: str
+    port: int
     password: str
+    database: str
 
 
 @dataclass
@@ -48,7 +50,9 @@ def get_settings_db(path: str):
         datadb=DatabaseSetting(
             host=env.str("HOST"),
             user=env.str("USER"),
-            password=env.str("PASSWORD")
+            port=env.int("PORT"),
+            password=env.str("PASSWORD"),
+            database=env.str("NAME_DATABASE")
         )
     )
 

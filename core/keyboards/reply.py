@@ -18,9 +18,11 @@ def get_anime_keyboard():
     keyboard_builder = ReplyKeyboardBuilder()
 
     keyboard_builder.button(text="Случайное аниме")
-    keyboard_builder.button(text="В разработке")
+    # Свежее т.е то что сейчас имеет статус "в работе"
+    keyboard_builder.button(text="Свежее")
+    keyboard_builder.button(text="Поиск аниме")
     keyboard_builder.button(text="Назад")
-    keyboard_builder.adjust(2)
+    keyboard_builder.adjust(2, 1, 1)
 
     return keyboard_builder.as_markup(resize_keyboard=True,
                                       one_time_keyboard=False,
@@ -44,7 +46,7 @@ def get_favorites_keyboard():
     keyboard_builder = ReplyKeyboardBuilder()
 
     keyboard_builder.button(text="Список избранных аниме")
-    keyboard_builder.button(text="В разработке")
+    keyboard_builder.button(text="Редактировать избранное")
     keyboard_builder.button(text="Назад")
     keyboard_builder.adjust(2)
 
@@ -52,3 +54,9 @@ def get_favorites_keyboard():
                                       one_time_keyboard=False,
                                       input_field_placeholder='Что хочешь сделать?')
 
+
+def get_back():
+    keyboard_builder = ReplyKeyboardBuilder()
+
+    keyboard_builder.button(text="Назад")
+    return keyboard_builder.as_markup(resize_keyboard=True)

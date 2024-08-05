@@ -19,22 +19,23 @@ class DarkLibriaSpider(scrapy.Spider):
             host=settings_bd.datadb.host,
             user=settings_bd.datadb.user,
             port=int(settings_bd.datadb.port),
-            password=settings_bd.datadb.password
+            password=settings_bd.datadb.password,
+            database=settings_bd.datadb.database
         )
         self.cursor = self.con.cursor()
 
     def parse(self, response, **kwargs):
-        for h5 in response.css('td[class="torrent text-center h5"]'):
+        for h5, episodes in zip(response.css('td[class="torrent text-center h5"]'),
+                                response.css('table[class="table table-sm table-bordered table-sm table-dark"]')):
             anime_name = h5.css('a::attr(onclick)').get()
             description_name = re.search(r'"[^"]*"(,\s*"([^"]*)")', anime_name).group(2)
+
             anime_link = h5.css('a::attr(href)').get()
 
-            self.insert_into_bd(anime_name=description_name, anime_link=anime_link)
+            anime_episodes = episodes.css('div[class="d-xs-block d-sm-none"] span::text').get()
 
-            yield {
-                'anime_link': anime_link,
-                'anime_name': description_name
-            }
+            self.insert_into_bd(anime_name=description_name, anime_link=anime_link, anime_episodes=anime_episodes)
+
         next_page = response.css('li[class="page-item  bg-dark"]:nth-last-of-type(2) a::attr(href)').get()
         if next_page is not None:
             next_page = response.urljoin(next_page)
@@ -42,13 +43,13 @@ class DarkLibriaSpider(scrapy.Spider):
 
         self.logger.info(f"Парсинг страницы: {response.url}")
 
-    def insert_into_bd(self, anime_name, anime_link):
+    def insert_into_bd(self, anime_name, anime_link, anime_episodes):
         try:
             self.cursor.execute("""
-                INSERT INTO anime (anime_name, anime_link)
-                VALUES (%s, %s)
+                INSERT INTO anime (anime_name, anime_link, anime_episodes)
+                VALUES (%s, %s, %s)
                 ON DUPLICATE KEY UPDATE anime_link = VALUES(anime_link);
-            """, (anime_name, anime_link))
+            """, (anime_name, anime_link, anime_episodes))
             self.con.commit()
         except con.Error as e:
             self.logger.error(f"Ошибка при вставке в базу данных: {e}")
